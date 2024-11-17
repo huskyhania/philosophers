@@ -6,7 +6,7 @@
 /*   By: hskrzypi <hskrzypi@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 15:45:01 by hskrzypi          #+#    #+#             */
-/*   Updated: 2024/11/16 20:39:30 by hskrzypi         ###   ########.fr       */
+/*   Updated: 2024/11/17 16:11:12 by hskrzypi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ static int	input_check(int argc, char **argv, int *input)
 
 static int	input_error(void)
 {
-	int ret;
+	int	ret;
 
 	ret = printf("Please give 4 or 5 positive numbers\n"
 		"no of philos(1), time to die(2), eat(3), sleep(4)\n"
@@ -85,8 +85,8 @@ static int	input_error(void)
 
 int	main(int argc, char **argv)
 {
-	int input[5];
-	t_all ph_params;
+	int	input[5];
+	t_all	ph_params;
 
 	if (argc < 5 || argc > 6)
 		return	(input_error());
