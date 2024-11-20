@@ -6,7 +6,7 @@
 /*   By: hskrzypi <hskrzypi@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 18:15:54 by hskrzypi          #+#    #+#             */
-/*   Updated: 2024/11/17 17:24:54 by hskrzypi         ###   ########.fr       */
+/*   Updated: 2024/11/20 20:59:55 by hskrzypi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,13 @@
 
 typedef struct philo_table
 {
-	int no_philos;
-	int time_to_die;
-	int time_to_eat;
-	int time_to_sleep;
-	int meals_no;
-	struct philosopher *t_philo; //array of philosopher structs
+	int	no_philos;
+	int	time_to_die;
+	int	time_to_eat;
+	int	time_to_sleep;
+	int	meals_no;
+	pthread_mutex_t	*forks;
+	struct philosopher	*t_philo; //array of philosopher structs
 }	t_all;
 
 typedef struct philosopher
