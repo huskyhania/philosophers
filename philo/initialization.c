@@ -6,7 +6,7 @@
 /*   By: hskrzypi <hskrzypi@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 20:19:28 by hskrzypi          #+#    #+#             */
-/*   Updated: 2024/11/20 21:35:35 by hskrzypi         ###   ########.fr       */
+/*   Updated: 2024/11/24 19:37:40 by hskrzypi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,14 +91,22 @@ void	init_philos(int *input, t_all *params, int argc)
 		pthread_mutex_init(&params->forks[i], NULL);
 		printf("mutex %d created\n", i);
 	}
-	t_philo philo[params->no_philos];
+	params->t_philo = malloc(sizeof(t_philo) * params->no_philos);
+	if (!params->t_philo)
+	{
+		printf("philo malloc error");
+		return ;
+	}
+	i = -1;
 	while (++i < params->no_philos)
 	{
-		philo[i].id = i + 1;
-		philo[i].meals_count = 0;
-		philo[i].last_meals_time = 0;
-		philo[i].params = params;
+		params->t_philo[i].id = i + 1;
+		params->t_philo[i].meals_count = 0;
+		params->t_philo[i].last_meals_time = 0;
+		params->t_philo[i].left = &params->forks[i];
+		params->t_philo[i].right = &params->forks[(i + 1) % params->no_philos];
+		params->t_philo[i].params = params;
+		printf("philo %d created, left fork %d and right fork %d", i, i, (i + 1) % params->no_philos);
 	}
-	params->t_philo = philo;
 	init_threads(params);
 }
