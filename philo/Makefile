@@ -6,13 +6,13 @@
 #    By: hskrzypi <hskrzypi@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/09 18:19:12 by hskrzypi          #+#    #+#              #
-#    Updated: 2024/11/16 20:34:13 by hskrzypi         ###   ########.fr        #
+#    Updated: 2025/02/01 17:16:47 by hskrzypi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	= philo
 
-SRC	= main.c initialization.c
+SRC	= main.c initialization.c utils.c monitor.c
 
 HEAD	= philo.h
 

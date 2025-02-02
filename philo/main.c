@@ -96,13 +96,6 @@ int	main(int argc, char **argv)
 		{
 			printf("Run philosophers\n");
 			init_philos(input, &ph_params, argc);
-			for (int i = 0; i < argc - 1; i++)
-				printf("input[%d]: %d\n", i + 1, input[i]);
-			printf("%d philos\n", ph_params.no_philos);
-			printf("%d death_time\n", ph_params.time_to_die);
-			printf("%d eat_time\n", ph_params.time_to_eat);
-			printf("%d sleep time\n", ph_params.time_to_sleep);
-			printf("%d meals_no\n", ph_params.meals_no);
 		}
 		else
 			return (input_error());
