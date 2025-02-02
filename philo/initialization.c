@@ -39,22 +39,26 @@ void	*simulation(void *philo_data)
 		if (philo->id % 2 == 0)
 		{
 			pthread_mutex_lock(philo->left);
+			print_action(philo, "has taken a fork (left)");
 			if (check_for_death(params))
 			{
 				pthread_mutex_unlock(philo->left);
 				break ;
 			}
 			pthread_mutex_lock(philo->right);
+			print_action(philo, "has taken a fork (right)");
 		}
 		else
 		{
 			pthread_mutex_lock(philo->right);
+			print_action(philo, "has taken a fork (right)");
 			if (check_for_death(params))
 			{
 				pthread_mutex_unlock(philo->right);
 				break ;
 			}
 			pthread_mutex_lock(philo->left);
+			print_action(philo, "has taken a fork (left)");
 		}
 		if (check_for_death(params))
 		{
