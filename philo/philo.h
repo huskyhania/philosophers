@@ -54,7 +54,7 @@ void	*simulation(void *philo_data);
 void	init_threads(t_all *params);
 long	get_time_ms(void);
 void	print_action(t_philo *philo, char *message);
-void	monitor(void *param);
+void	*monitor(void *param);
 int		check_for_death(t_all *params);
 
 #endif

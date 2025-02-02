@@ -19,8 +19,8 @@ void	*simulation(void *philo_data)
 	printf("Philosopher %d successfully started simulation\n", philo->id);
 	while (get_time_ms() < params->start_time)
 		usleep(100);
-	if (philo->id % 2 == 0)
-		usleep(500);
+	//if (philo->id % 2 == 0)
+	//	usleep(500);
 	while (1)
 	{
 		if (check_for_death(params))

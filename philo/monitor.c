@@ -12,7 +12,7 @@
 
 #include "philo.h"
 
-void	monitor(void *param)
+void	*monitor(void *param)
 {
 	t_all	*params = (t_all *)param;
 	int	i;
@@ -32,7 +32,7 @@ void	monitor(void *param)
 				pthread_mutex_unlock(&params->dead_flag);
 				print_action(&params->t_philo[i], "died");
 				pthread_mutex_unlock(&params->t_philo[i].meal_lock);
-				return ;
+				return (NULL);
 			}
 			if (params->meals_no > 0 && params->t_philo[i].meals_count >= params->meals_no)
 				finished_meals++;
@@ -45,8 +45,9 @@ void	monitor(void *param)
 			params->dead = 1;
 			pthread_mutex_unlock(&params->dead_flag);
 			printf("All philosophers have eaten enough times. Ending simulation.\n");
-			return ;
+			return (NULL);
 		}
-		usleep(400);
+		usleep(1000);
 	}
+	return (NULL);
 }
