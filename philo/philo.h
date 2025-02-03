@@ -40,6 +40,7 @@ typedef struct philosopher //one philosopher
 {
 	int	id;
 	int	meals_count;
+	int	eating_f;
 	long	last_meals_time;
 	pthread_mutex_t	*left;
 	pthread_mutex_t	*right;

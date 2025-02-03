@@ -24,7 +24,7 @@ void	print_action(t_philo *philo, char *message)
 	t_all *params = philo->params;
 	
 	pthread_mutex_lock(&params->print_mutex);
-	 // Only print if no one has died
+	//if (!philo->params->dead)
 	printf("%ld %d %s\n", get_time_ms() - params->start_time, philo->id, message);
 	pthread_mutex_unlock(&params->print_mutex);
 }

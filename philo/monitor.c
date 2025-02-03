@@ -25,7 +25,7 @@ void	*monitor(void *param)
 		while (++i < params->no_philos)
 		{
 			pthread_mutex_lock(&params->t_philo[i].meal_lock);
-			if ((get_time_ms() - params->t_philo[i].last_meals_time) >= params->time_to_die)
+			if (((get_time_ms() - params->t_philo[i].last_meals_time) >= params->time_to_die) && (!params->t_philo[i].eating_f))
 			{
 				pthread_mutex_lock(&params->dead_flag);
 				params->dead = 1;

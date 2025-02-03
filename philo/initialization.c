@@ -19,15 +19,11 @@ void	*simulation(void *philo_data)
 	printf("Philosopher %d successfully started simulation\n", philo->id);
 	while (get_time_ms() < params->start_time)
 		usleep(100);
-	//if (philo->id % 2 == 0)
-	//	usleep(500);
-	while (1)
+	if (philo->id % 2 != 0)
+		usleep(500);
+	while (1 && !params->dead)
 	{
-		if (check_for_death(params))
-			break ;
 		print_action(philo, "is thinking");
-		if (check_for_death(params))
-			break ;
 		if (params->no_philos == 1)
 		{
 			pthread_mutex_lock(philo->left);
@@ -36,44 +32,32 @@ void	*simulation(void *philo_data)
 			pthread_mutex_unlock(philo->left);
 			break;
 		}
-		if (philo->id % 2 == 0)
+		if (philo->id % 2 == 0 || philo->id == params->no_philos)
 		{
 			pthread_mutex_lock(philo->left);
-			print_action(philo, "has taken a fork (left)");
-			if (check_for_death(params))
-			{
-				pthread_mutex_unlock(philo->left);
-				break ;
-			}
+			print_action(philo, "has taken a fork");
 			pthread_mutex_lock(philo->right);
-			print_action(philo, "has taken a fork (right)");
+			print_action(philo, "has taken a fork");
 		}
 		else
 		{
 			pthread_mutex_lock(philo->right);
-			print_action(philo, "has taken a fork (right)");
-			if (check_for_death(params))
-			{
-				pthread_mutex_unlock(philo->right);
-				break ;
-			}
+			print_action(philo, "has taken a fork");
 			pthread_mutex_lock(philo->left);
-			print_action(philo, "has taken a fork (left)");
+			print_action(philo, "has taken a fork");
 		}
-		if (check_for_death(params))
-		{
-			pthread_mutex_unlock(philo->left);
-			pthread_mutex_unlock(philo->right);
-			break ;
-		}
+		philo->eating_f = 1;
 		print_action(philo, "is eating");
-		philo->meals_count++;
-		usleep(params->time_to_eat * 1000);
+		pthread_mutex_lock(&philo->meal_lock);
 		philo->last_meals_time = get_time_ms();
+		pthread_mutex_unlock(&philo->meal_lock);
+		usleep(params->time_to_eat * 1000);
+		pthread_mutex_lock(&philo->meal_lock);
+		philo->meals_count++;
+		pthread_mutex_unlock(&philo->meal_lock);
+		philo->eating_f = 0;
 		pthread_mutex_unlock(philo->right);
 		pthread_mutex_unlock(philo->left);
-		if (check_for_death(params))
-			break ;
 		if (params->meals_no > 0 && philo->meals_count >= params->meals_no)
 			break;
 		print_action(philo, "is sleeping");
@@ -163,6 +147,7 @@ void	init_philos(int *input, t_all *params, int argc)
 		params->t_philo[i].last_meals_time = params->start_time;
 		params->t_philo[i].left = &params->forks[i];
 		params->t_philo[i].right = &params->forks[(i + 1) % params->no_philos];
+		params->t_philo[i].eating_f = 0;
 		params->t_philo[i].params = params;
 		pthread_mutex_init(&params->t_philo[i].meal_lock, NULL);
 		printf("philo %d created, left fork %d and right fork %d\n", i, i, (i + 1) % params->no_philos);
