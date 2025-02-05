@@ -12,6 +12,14 @@
 
 #include "philo.h"
 
+void	one_philo(t_philo *philo, t_all *params)
+{
+	pthread_mutex_lock(philo->left);
+	print_action(philo, "has taken a fork");
+	precise_usleep(params->time_to_die);
+	pthread_mutex_unlock(philo->left);
+}
+
 void	*simulation(void *philo_data)
 {
 	t_philo *philo = (t_philo *)philo_data;
@@ -20,19 +28,21 @@ void	*simulation(void *philo_data)
 	while (get_time_ms() < params->start_time)
 		usleep(100);
 	if (philo->id % 2 != 0)
-		usleep(500);
-	while (1 && !params->dead)
 	{
 		print_action(philo, "is thinking");
+		precise_usleep(50);
+	}
+	while (!params->dead)
+	{
+		//if (philo->id % 2 != 0)
+		//	precise_usleep(500);
+		//print_action(philo, "is thinking");
 		if (params->no_philos == 1)
 		{
-			pthread_mutex_lock(philo->left);
-			print_action(philo, "has taken a fork");
-			usleep(params->time_to_die * 1000);
-			pthread_mutex_unlock(philo->left);
+			one_philo(philo, params);
 			break;
 		}
-		if (philo->id % 2 == 0 || philo->id == params->no_philos)
+		if (philo->id == params->no_philos)
 		{
 			pthread_mutex_lock(philo->left);
 			print_action(philo, "has taken a fork");
@@ -51,7 +61,7 @@ void	*simulation(void *philo_data)
 		pthread_mutex_lock(&philo->meal_lock);
 		philo->last_meals_time = get_time_ms();
 		pthread_mutex_unlock(&philo->meal_lock);
-		usleep(params->time_to_eat * 1000);
+		precise_usleep(params->time_to_eat);
 		pthread_mutex_lock(&philo->meal_lock);
 		philo->meals_count++;
 		pthread_mutex_unlock(&philo->meal_lock);
@@ -61,7 +71,8 @@ void	*simulation(void *philo_data)
 		if (params->meals_no > 0 && philo->meals_count >= params->meals_no)
 			break;
 		print_action(philo, "is sleeping");
-		usleep(params->time_to_sleep * 1000);
+		precise_usleep(params->time_to_sleep);
+		print_action(philo, "is thinking");
 	}
 	pthread_exit(NULL);
 }
@@ -150,7 +161,8 @@ void	init_philos(int *input, t_all *params, int argc)
 		params->t_philo[i].eating_f = 0;
 		params->t_philo[i].params = params;
 		pthread_mutex_init(&params->t_philo[i].meal_lock, NULL);
-		printf("philo %d created, left fork %d and right fork %d\n", i, i, (i + 1) % params->no_philos);
+		printf("philo %d created, left fork %d and right fork %d\n",
+			params->t_philo[i].id, i, (i + 1) % params->no_philos);
 	}
 	init_threads(params);
 }

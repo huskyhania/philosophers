@@ -57,5 +57,6 @@ long	get_time_ms(void);
 void	print_action(t_philo *philo, char *message);
 void	*monitor(void *param);
 int		check_for_death(t_all *params);
+int		precise_usleep(int milisecs);
 
 #endif

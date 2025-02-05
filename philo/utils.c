@@ -40,3 +40,13 @@ int	check_for_death(t_all *params)
 	pthread_mutex_unlock(&params->dead_flag);
 	return (0);
 }
+
+int	precise_usleep(int milisecs)
+{
+	long	start;
+
+	start = get_time_ms();
+	while ((get_time_ms() - start) < milisecs)
+		usleep(500);
+	return (0);
+}

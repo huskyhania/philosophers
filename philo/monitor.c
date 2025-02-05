@@ -25,8 +25,10 @@ void	*monitor(void *param)
 		while (++i < params->no_philos)
 		{
 			pthread_mutex_lock(&params->t_philo[i].meal_lock);
-			if (((get_time_ms() - params->t_philo[i].last_meals_time) >= params->time_to_die) && (!params->t_philo[i].eating_f))
+			if (((get_time_ms() - params->t_philo[i].last_meals_time) > params->time_to_die) && (!params->t_philo[i].eating_f))
 			{
+				// printf("%ld print from monitor\n", get_time_ms() - params->start_time);
+				printf("The last meal time of the deceased: %ld\n", get_time_ms() - params->t_philo[i].last_meals_time);
 				pthread_mutex_lock(&params->dead_flag);
 				params->dead = 1;
 				pthread_mutex_unlock(&params->dead_flag);
@@ -47,7 +49,7 @@ void	*monitor(void *param)
 			printf("All philosophers have eaten enough times. Ending simulation.\n");
 			return (NULL);
 		}
-		usleep(1000);
+		//precise_usleep(500);
 	}
 	return (NULL);
 }
