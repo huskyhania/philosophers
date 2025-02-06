@@ -20,35 +20,32 @@
 # include <stdlib.h> //for exit
 # include <sys/time.h>
 
-typedef struct philo_table //main struct
+typedef struct s_philo_table
 {
-	int	no_philos;
-	int	time_to_die;
-	int	time_to_eat;
-	int	time_to_sleep;
-	int	meals_no;
-	int	dead;
-	pthread_mutex_t	*forks;
-	pthread_mutex_t	dead_flag;
-	pthread_mutex_t	print_mutex;
-	struct philosopher	*t_philo; //array of philosopher structs
-	long	start_time;
-	pthread_t	*threads;
+	int						no_philos;
+	int						time_to_die;
+	int						time_to_eat;
+	int						time_to_sleep;
+	int						meals_no;
+	int						dead;
+	pthread_mutex_t			*forks;
+	pthread_mutex_t			dead_flag;
+	pthread_mutex_t			print_mutex;
+	struct s_philosopher	*t_philo;
+	long					start_time;
+	pthread_t				*threads;
 }	t_all;
 
-typedef struct philosopher //one philosopher
+typedef struct s_philosopher
 {
-	int	id;
-	int	meals_count;
-	int	eating_f;
-	long	last_meals_time;
+	int				id;
+	int				meals_count;
+	long			last_meals_time;
 	pthread_mutex_t	*left;
 	pthread_mutex_t	*right;
-	pthread_mutex_t	meal_lock; 
-	t_all	*params;
+	pthread_mutex_t	meal_lock;
+	t_all			*params;
 }	t_philo;
-
-//mutexes for dead flag and printing
 
 void	init_philos(int *input, t_all *params, int argc);
 void	*simulation(void *philo_data);
@@ -57,6 +54,6 @@ long	get_time_ms(void);
 void	print_action(t_philo *philo, char *message);
 void	*monitor(void *param);
 int		check_for_death(t_all *params);
-int		precise_usleep(int milisecs);
+int		precise_usleep(int millisecs);
 
 #endif

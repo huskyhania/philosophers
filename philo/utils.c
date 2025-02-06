@@ -6,7 +6,7 @@
 /*   By: hskrzypi <hskrzypi@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 15:39:09 by hskrzypi          #+#    #+#             */
-/*   Updated: 2025/02/01 14:48:26 by hskrzypi         ###   ########.fr       */
+/*   Updated: 2025/02/06 17:29:35 by hskrzypi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,21 @@
 
 long	get_time_ms(void)
 {
-	struct timeval tv;
+	struct timeval	tv;
+
 	gettimeofday(&tv, NULL);
 	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
 }
 
 void	print_action(t_philo *philo, char *message)
 {
-	t_all *params = philo->params;
-	
+	t_all	*params;
+
+	params = philo->params;
 	pthread_mutex_lock(&params->print_mutex);
-	//if (!philo->params->dead)
-	printf("%ld %d %s\n", get_time_ms() - params->start_time, philo->id, message);
+	if (!philo->params->dead)
+		printf("%ld %d %s\n", get_time_ms() - params->start_time,
+			philo->id, message);
 	pthread_mutex_unlock(&params->print_mutex);
 }
 
@@ -41,12 +44,12 @@ int	check_for_death(t_all *params)
 	return (0);
 }
 
-int	precise_usleep(int milisecs)
+int	precise_usleep(int millisecs)
 {
 	long	start;
 
 	start = get_time_ms();
-	while ((get_time_ms() - start) < milisecs)
+	while ((get_time_ms() - start) < millisecs)
 		usleep(500);
 	return (0);
 }

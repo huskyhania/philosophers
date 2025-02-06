@@ -24,25 +24,25 @@ void	*simulation(void *philo_data)
 {
 	t_philo *philo = (t_philo *)philo_data;
 	t_all *params = philo->params;
-	printf("Philosopher %d successfully started simulation\n", philo->id);
 	while (get_time_ms() < params->start_time)
 		usleep(100);
 	if (philo->id % 2 != 0)
 	{
-		print_action(philo, "is thinking");
-		precise_usleep(50);
+		print_action(philo, "is sleeping");
+		precise_usleep(params->time_to_sleep);
 	}
+	pthread_mutex_lock(&params->dead_flag);
 	while (!params->dead)
 	{
-		//if (philo->id % 2 != 0)
-		//	precise_usleep(500);
-		//print_action(philo, "is thinking");
+		pthread_mutex_unlock(&params->dead_flag);
+		print_action(philo, "is thinking");
+		usleep(1000);
 		if (params->no_philos == 1)
 		{
 			one_philo(philo, params);
 			break;
 		}
-		if (philo->id == params->no_philos)
+		if (philo->id % 2 == 0 || philo->id == 1)
 		{
 			pthread_mutex_lock(philo->left);
 			print_action(philo, "has taken a fork");
@@ -56,7 +56,6 @@ void	*simulation(void *philo_data)
 			pthread_mutex_lock(philo->left);
 			print_action(philo, "has taken a fork");
 		}
-		philo->eating_f = 1;
 		print_action(philo, "is eating");
 		pthread_mutex_lock(&philo->meal_lock);
 		philo->last_meals_time = get_time_ms();
@@ -65,15 +64,15 @@ void	*simulation(void *philo_data)
 		pthread_mutex_lock(&philo->meal_lock);
 		philo->meals_count++;
 		pthread_mutex_unlock(&philo->meal_lock);
-		philo->eating_f = 0;
 		pthread_mutex_unlock(philo->right);
 		pthread_mutex_unlock(philo->left);
 		if (params->meals_no > 0 && philo->meals_count >= params->meals_no)
 			break;
 		print_action(philo, "is sleeping");
 		precise_usleep(params->time_to_sleep);
-		print_action(philo, "is thinking");
+		pthread_mutex_lock(&params->dead_flag);
 	}
+	pthread_mutex_unlock(&params->dead_flag);
 	pthread_exit(NULL);
 }
 
@@ -97,22 +96,13 @@ void	init_threads(t_all *params)
 			printf("Thread create error for philo %d\n", i + 1);//add freeing of the previously allocated threads, params
 			exit (1);
 		}
-		else
-			printf("Thread %d created for philo %d\n", i, i + 1);
 	}
 	if (pthread_create(&monitor_th, NULL, (void *(*)(void *))monitor, params) != 0)
-	{
-		printf("Monitor thread create error\n");
 		exit(1);
-	}
 	i = -1;
 	while (++i < params->no_philos)
-	{
 		pthread_join(threads[i], NULL);
-		printf("thread %d for philo %d joined\n", i, i + 1);
-	}
 	pthread_join(monitor_th, NULL);
-	printf("Monitor thread joined\n");
 	params->threads = threads;
 }
 
@@ -142,7 +132,7 @@ void	init_philos(int *input, t_all *params, int argc)
 	while (++i < params->no_philos)
 	{
 		pthread_mutex_init(&params->forks[i], NULL);
-		printf("mutex %d created\n", i);
+		//printf("mutex %d created\n", i);
 	}
 	params->t_philo = malloc(sizeof(t_philo) * params->no_philos);
 	if (!params->t_philo)
@@ -158,11 +148,8 @@ void	init_philos(int *input, t_all *params, int argc)
 		params->t_philo[i].last_meals_time = params->start_time;
 		params->t_philo[i].left = &params->forks[i];
 		params->t_philo[i].right = &params->forks[(i + 1) % params->no_philos];
-		params->t_philo[i].eating_f = 0;
 		params->t_philo[i].params = params;
 		pthread_mutex_init(&params->t_philo[i].meal_lock, NULL);
-		printf("philo %d created, left fork %d and right fork %d\n",
-			params->t_philo[i].id, i, (i + 1) % params->no_philos);
 	}
 	init_threads(params);
 }

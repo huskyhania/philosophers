@@ -32,9 +32,9 @@ static int	is_number(const char *str)
 
 static long	ft_atol(const char *str)
 {
-	int	i;
+	int		i;
+	int		negation;
 	long	number;
-	int	negation;
 
 	i = 0;
 	number = 0;
@@ -55,14 +55,15 @@ static long	ft_atol(const char *str)
 
 static int	input_check(int argc, char **argv, int *input)
 {
-	int	i;
+	int		i;
 	long	n;
+
 	i = 1;
 	while (i < argc)
 	{
 		if (is_number(argv[i]))
 			n = ft_atol(argv[i]);
-		else 
+		else
 			return (1);
 		if (n > 0 && n <= INT_MAX)
 			input[i - 1] = (int)n;
@@ -78,25 +79,22 @@ static int	input_error(void)
 	int	ret;
 
 	ret = printf("Please give 4 or 5 positive numbers\n"
-		"no of philos(1), time to die(2), eat(3), sleep(4)\n"
-		"and optional number of meals(5)\n");
+			"no of philos(1), time to die(2), eat(3), sleep(4)\n"
+			"and optional number of meals(5)\n");
 	return (ret);
 }
 
 int	main(int argc, char **argv)
 {
-	int	input[5];
+	int		input[5];
 	t_all	ph_params;
 
 	if (argc < 5 || argc > 6)
-		return	(input_error());
+		return (input_error());
 	else
 	{
 		if (!input_check(argc, argv, input))
-		{
-			printf("Run philosophers\n");
 			init_philos(input, &ph_params, argc);
-		}
 		else
 			return (input_error());
 	}
