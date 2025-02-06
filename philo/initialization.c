@@ -6,7 +6,7 @@
 /*   By: hskrzypi <hskrzypi@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 20:19:28 by hskrzypi          #+#    #+#             */
-/*   Updated: 2025/02/01 17:22:33 by hskrzypi         ###   ########.fr       */
+/*   Updated: 2025/02/06 19:31:08 by hskrzypi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ void	init_threads(t_all *params)
 		}
 	}
 	if (pthread_create(&monitor_th, NULL, (void *(*)(void *))monitor, params) != 0)
-		exit(1);
+		exit(1);// exit is not allowed in mandatory
 	i = -1;
 	while (++i < params->no_philos)
 		pthread_join(threads[i], NULL);
@@ -106,11 +106,8 @@ void	init_threads(t_all *params)
 	params->threads = threads;
 }
 
-void	init_philos(int *input, t_all *params, int argc)
+static void	fill_struct(int *input, t_all *params, int argc)
 {
-	int	i;
-
-	i = -1;
 	params->no_philos = input[0];
 	params->time_to_die = input[1];
 	params->time_to_eat = input[2];
@@ -121,6 +118,14 @@ void	init_philos(int *input, t_all *params, int argc)
 		params->meals_no = -1;
 	params->dead = 0;
 	params->start_time = get_time_ms() + 1000;
+}
+
+void	init_philos(int *input, t_all *params, int argc)
+{
+	int	i;
+
+	i = -1;
+	fill_struct(input, params, argc);
 	pthread_mutex_init(&params->dead_flag, NULL);
 	pthread_mutex_init(&params->print_mutex, NULL);
 	params->forks = malloc(sizeof(pthread_mutex_t) * params->no_philos);
