@@ -12,7 +12,7 @@
 
 NAME	= philo
 
-SRC	= main.c initialization.c utils.c monitor.c
+SRC	= main.c initialization.c utils.c monitor.c routine.c
 
 HEAD	= philo.h
 
