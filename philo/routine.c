@@ -94,5 +94,5 @@ void	*dining(void *philo_data)
 		pthread_mutex_lock(&philo->params->dead_flag);
 	}
 	pthread_mutex_unlock(&philo->params->dead_flag);
-	pthread_exit(NULL);
+	return (NULL);
 }

@@ -26,7 +26,7 @@ void	check_death_occured(t_all *params, int i)
 			get_time_ms() - params->start_time, params->t_philo[i].id);
 		pthread_mutex_unlock(&params->print_mutex);
 		pthread_mutex_unlock(&params->t_philo[i].meal_lock);
-		pthread_exit(NULL);
+		return ;
 	}
 	pthread_mutex_unlock(&params->t_philo[i].meal_lock);
 }
@@ -70,8 +70,9 @@ void	*monitor(void *param)
 		i = -1;
 		while (++i < params->no_philos)
 		{
-			check_death_occured(params, i);
-			if (params->dead)
+			if (!params->dead)
+				check_death_occured(params, i);
+			else
 				return (NULL);
 		}
 		if (check_eating_done(params))
@@ -83,7 +84,7 @@ void	*monitor(void *param)
 			return (NULL);
 		}
 		pthread_mutex_unlock(&params->dead_flag);
-		precise_usleep(5000);
+		//precise_usleep(5000);
 	}
 	return (NULL);
 }
