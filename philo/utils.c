@@ -25,23 +25,15 @@ void	print_action(t_philo *philo, char *message)
 	t_all	*params;
 
 	params = philo->params;
-	pthread_mutex_lock(&params->print_mutex);
+	pthread_mutex_lock(&params->dead_flag);
 	if (!philo->params->dead)
+	{
+		pthread_mutex_lock(&params->print_mutex);
 		printf("%ld %d %s\n", get_time_ms() - params->start_time,
 			philo->id, message);
-	pthread_mutex_unlock(&params->print_mutex);
-}
-
-int	check_for_death(t_all *params)
-{
-	pthread_mutex_lock(&params->dead_flag);
-	if (params->dead)
-	{
-		pthread_mutex_unlock(&params->dead_flag);
-		return (1);
+		pthread_mutex_unlock(&params->print_mutex);
 	}
 	pthread_mutex_unlock(&params->dead_flag);
-	return (0);
 }
 
 int	precise_usleep(int millisecs)
@@ -52,4 +44,35 @@ int	precise_usleep(int millisecs)
 	while ((get_time_ms() - start) < millisecs)
 		usleep(500);
 	return (0);
+}
+
+void	cleanup_mutexes(t_all *params)
+{
+	int	i;
+
+	i = -1;
+	pthread_mutex_destroy(&params->dead_flag);
+	pthread_mutex_destroy(&params->print_mutex);
+	while (++i < params->no_philos)
+		pthread_mutex_destroy(&params->forks[i]);
+}
+
+void	all_cleanup(t_all *params)
+{
+	int	i;
+
+	i = -1;
+	cleanup_mutexes(params);
+	if (params->t_philo)
+	{
+		while (++i < params->no_philos)
+			pthread_mutex_destroy(&params->t_philo[i].meal_lock);
+		free(params->t_philo);
+		params->t_philo = NULL;
+	}
+	if (params->forks)
+	{
+		free(params->forks);
+		params->forks = NULL;
+	}
 }

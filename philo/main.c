@@ -94,7 +94,10 @@ int	main(int argc, char **argv)
 	else
 	{
 		if (!input_check(argc, argv, input))
+		{
 			init_philos(input, &ph_params, argc);
+			all_cleanup(&ph_params);
+		}
 		else
 			return (input_error());
 	}

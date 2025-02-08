@@ -34,6 +34,7 @@ typedef struct s_philo_table
 	struct s_philosopher	*t_philo;
 	long					start_time;
 	pthread_t				*threads;
+	pthread_t				monitor;
 }	t_all;
 
 typedef struct s_philosopher
@@ -48,12 +49,13 @@ typedef struct s_philosopher
 }	t_philo;
 
 void	init_philos(int *input, t_all *params, int argc);
-void	*simulation(void *philo_data);
-void	init_threads(t_all *params);
+void	*dining(void *philo_data);
+int		init_threads(t_all *params);
 long	get_time_ms(void);
 void	print_action(t_philo *philo, char *message);
 void	*monitor(void *param);
-int		check_for_death(t_all *params);
 int		precise_usleep(int millisecs);
+void	cleanup_mutexes(t_all *params);
+void	all_cleanup(t_all *params);
 
 #endif

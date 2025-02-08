@@ -68,7 +68,7 @@ void	philo_sleep(t_philo *philo, t_all *params)
 	precise_usleep(params->time_to_sleep);
 }
 
-void	*simulation(void *philo_data)
+void	*dining(void *philo_data)
 {
 	t_philo	*philo;
 

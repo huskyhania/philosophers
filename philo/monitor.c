@@ -69,10 +69,21 @@ void	*monitor(void *param)
 	{
 		i = -1;
 		while (++i < params->no_philos)
+		{
 			check_death_occured(params, i);
+			if (params->dead)
+				return (NULL);
+		}
 		if (check_eating_done(params))
 			return (NULL);
-		//precise_usleep(5000);
+		pthread_mutex_lock(&params->dead_flag);
+		if (params->dead)
+		{
+			pthread_mutex_unlock(&params->dead_flag);
+			return (NULL);
+		}
+		pthread_mutex_unlock(&params->dead_flag);
+		precise_usleep(5000);
 	}
 	return (NULL);
 }

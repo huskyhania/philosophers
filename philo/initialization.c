@@ -6,40 +6,55 @@
 /*   By: hskrzypi <hskrzypi@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 20:19:28 by hskrzypi          #+#    #+#             */
-/*   Updated: 2025/02/07 15:02:21 by hskrzypi         ###   ########.fr       */
+/*   Updated: 2025/02/08 15:02:25 by hskrzypi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	init_threads(t_all *params)
+void	join_threads(t_all *params)
 {
 	int	i;
-	pthread_t	*threads;
-	pthread_t	monitor_th;
 
 	i = -1;
-	threads = malloc(params->no_philos * sizeof(pthread_t));
-	if (!threads)
-	{
-		printf("Thread array malloc fail\n");
-		return ;
-	}
 	while (++i < params->no_philos)
 	{
-		if (pthread_create(&threads[i], NULL, simulation, &params->t_philo[i]) != 0)
+		if (pthread_join(params->threads[i], NULL) != 0)
+			printf("Failed to join thread %d\n", i);
+	}
+	if (pthread_join(params->monitor, NULL) != 0)
+		printf("Failed to join monitor thread\n");
+	free(params->threads);
+	params->threads = NULL;
+}
+
+int	init_threads(t_all *p)
+{
+	int	i;
+
+	i = -1;
+	p->threads = malloc(p->no_philos * sizeof(pthread_t));
+	if (!p->threads)
+		return (printf("Thread array malloc fail\n"));
+	while (++i < p->no_philos)
+	{
+		if (pthread_create(&p->threads[i], NULL, dining, &p->t_philo[i]) != 0)
 		{
-			printf("Thread create error for philo %d\n", i + 1);//add freeing of the previously allocated threads, params
-			exit (1);
+			while (--i >= 0)
+				pthread_detach(p->threads[i]);
+			free(p->threads);
+			return (printf("Thread create error for philo %d\n", i + 1));
 		}
 	}
-	if (pthread_create(&monitor_th, NULL, (void *(*)(void *))monitor, params) != 0)
-		exit(1);// exit is not allowed in mandatory
-	i = -1;
-	while (++i < params->no_philos)
-		pthread_join(threads[i], NULL);
-	pthread_join(monitor_th, NULL);
-	params->threads = threads;
+	if (pthread_create(&p->monitor, NULL, monitor, p) != 0)
+	{
+		while (--i >= 0)
+			pthread_detach(p->threads[i]);
+		free(p->threads);
+		return (printf("monitor thread creation fail\n"));
+	}
+	join_threads(p);
+	return (0);
 }
 
 static void	fill_struct(int *input, t_all *params, int argc)
@@ -54,17 +69,6 @@ static void	fill_struct(int *input, t_all *params, int argc)
 		params->meals_no = -1;
 	params->dead = 0;
 	params->start_time = get_time_ms() + 1000;
-}
-
-void	cleanup_mutexes(t_all *params)
-{
-	int	i;
-
-	i = -1;
-	pthread_mutex_destroy(&params->dead_flag);
-	pthread_mutex_destroy(&params->print_mutex);
-	while (++i < params->no_philos)
-		pthread_mutex_destroy(&params->forks[i]);
 }
 
 int	initialize_mutexes(t_all *params)
@@ -93,6 +97,34 @@ int	initialize_mutexes(t_all *params)
 	return (0);
 }
 
+int	fill_philo_structs(t_all *params)
+{
+	int	i;
+
+	i = -1;
+	params->t_philo = malloc(sizeof(t_philo) * params->no_philos);
+	if (!params->t_philo)
+		return (printf("philo array malloc error\n"));
+	while (++i < params->no_philos)
+	{
+		params->t_philo[i].id = i + 1;
+		params->t_philo[i].meals_count = 0;
+		params->t_philo[i].last_meals_time = params->start_time;
+		params->t_philo[i].left = &params->forks[i];
+		params->t_philo[i].right = &params->forks[(i + 1) % params->no_philos];
+		params->t_philo[i].params = params;
+		if (pthread_mutex_init(&params->t_philo[i].meal_lock, NULL) != 0)
+		{
+			while (--i >= 0)
+				pthread_mutex_destroy(&params->t_philo[i].meal_lock);
+			free(params->t_philo);
+			return (1);
+		}
+	}
+	init_threads(params);
+	return (0);
+}
+
 void	init_philos(int *input, t_all *params, int argc)
 {
 	int	i;
@@ -110,23 +142,11 @@ void	init_philos(int *input, t_all *params, int argc)
 		free(params->forks);
 		return ;
 	}
-	params->t_philo = malloc(sizeof(t_philo) * params->no_philos);
-	if (!params->t_philo)
+	if (!fill_philo_structs(params))
 	{
-		printf("philo array malloc error");//cleanup mutexes, free(params->forks)
-		cleanup_mutexes(params);
-		free(params->forks);
-		return ;
+		if (!init_threads(params))
+			return ;
 	}
-	while (++i < params->no_philos)
-	{
-		params->t_philo[i].id = i + 1;
-		params->t_philo[i].meals_count = 0;
-		params->t_philo[i].last_meals_time = params->start_time;
-		params->t_philo[i].left = &params->forks[i];
-		params->t_philo[i].right = &params->forks[(i + 1) % params->no_philos];
-		params->t_philo[i].params = params;
-		pthread_mutex_init(&params->t_philo[i].meal_lock, NULL);
-	}
-	init_threads(params);
+	cleanup_mutexes(params);
+	free(params->forks);
 }
