@@ -84,7 +84,6 @@ void	*monitor(void *param)
 			return (NULL);
 		}
 		pthread_mutex_unlock(&params->dead_flag);
-		//precise_usleep(5000);
 	}
 	return (NULL);
 }

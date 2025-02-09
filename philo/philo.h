@@ -48,14 +48,20 @@ typedef struct s_philosopher
 	t_all			*params;
 }	t_philo;
 
-void	init_philos(int *input, t_all *params, int argc);
+int		init_philos(int *input, t_all *params, int argc);
 void	*dining(void *philo_data);
-int		init_threads(t_all *params);
+int		init_threads(t_all *params, int i);
 long	get_time_ms(void);
 void	print_action(t_philo *philo, char *message);
 void	*monitor(void *param);
 int		precise_usleep(int millisecs);
 void	cleanup_mutexes(t_all *params);
 void	all_cleanup(t_all *params);
+
+void	philo_think(t_philo *philo);
+void	philo_eat(t_philo *philo, t_all *params);
+void	philo_take_forks(t_philo *philo);
+void	philo_release_forks(t_philo *philo);
+void	philo_sleep(t_philo *philo, t_all *params);
 
 #endif
