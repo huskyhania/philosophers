@@ -17,8 +17,12 @@
 # include <stdio.h>
 # include <unistd.h>
 # include <limits.h>
-# include <stdlib.h> //for exit
+# include <stdlib.h>
 # include <sys/time.h>
+# include <semaphore.h>
+# include <stdlib.h>
+# include <fcntl.h>
+# include <signal.h>
 
 typedef struct s_philo_table
 {
@@ -28,13 +32,13 @@ typedef struct s_philo_table
 	int						time_to_sleep;
 	int						meals_no;
 	int						dead;
-	pthread_mutex_t			*forks;
-	pthread_mutex_t			dead_flag;
-	pthread_mutex_t			print_mutex;
+	int						*pid_arr;
 	struct s_philosopher	*t_philo;
 	long					start_time;
-	pthread_t				*threads;
-	pthread_t				monitor;
+	sem_t					*sem_forks;
+	sem_t					*print_sem;
+	sem_t					*death_sem;
+	//monitor in parent?
 }	t_all;
 
 typedef struct s_philosopher
@@ -42,9 +46,7 @@ typedef struct s_philosopher
 	int				id;
 	int				meals_count;
 	long			last_meals_time;
-	pthread_mutex_t	*left;
-	pthread_mutex_t	*right;
-	pthread_mutex_t	meal_lock;
+	// meal sem?
 	t_all			*params;
 }	t_philo;
 
