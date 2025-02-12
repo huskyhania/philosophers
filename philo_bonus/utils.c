@@ -25,15 +25,15 @@ void	print_action(t_philo *philo, char *message)
 	t_all	*params;
 
 	params = philo->params;
-	pthread_mutex_lock(&params->dead_flag);//replace with semaphor
+	sem_wait(params->death_sem);
 	if (!philo->params->dead)
 	{
-		pthread_mutex_lock(&params->print_mutex);
+		sem_wait(params->print_sem);
 		printf("%ld %d %s\n", get_time_ms() - params->start_time,
 			philo->id, message);
-		pthread_mutex_unlock(&params->print_mutex);
+		sem_post(params->print_sem);
 	}
-	pthread_mutex_unlock(&params->dead_flag);
+	sem_post(params->death_sem);
 }
 
 int	precise_usleep(int millisecs)

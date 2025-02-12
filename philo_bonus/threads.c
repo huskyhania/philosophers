@@ -12,7 +12,7 @@
 
 #include "philo.h"
 
-void	join_threads(t_all *params)
+/*void	join_threads(t_all *params)
 {
 	if (pthread_join(params->monitor, NULL) != 0)
 		printf("Failed to join monitor thread\n");
@@ -26,4 +26,4 @@ int	init_threads(t_all *p, int i)
 	}
 	join_threads(p);
 	return (0);
-}
+}*/

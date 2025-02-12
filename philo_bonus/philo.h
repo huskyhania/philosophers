@@ -19,6 +19,7 @@
 # include <limits.h>
 # include <stdlib.h>
 # include <sys/time.h>
+# include <sys/wait.h>
 # include <semaphore.h>
 # include <stdlib.h>
 # include <fcntl.h>
@@ -65,5 +66,7 @@ void	philo_eat(t_philo *philo, t_all *params);
 void	philo_take_forks(t_philo *philo);
 void	philo_release_forks(t_philo *philo);
 void	philo_sleep(t_philo *philo, t_all *params);
+
+int		create_processes(t_all *params);
 
 #endif

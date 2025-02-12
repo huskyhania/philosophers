@@ -14,10 +14,10 @@
 
 static void	one_philo(t_philo *philo, t_all *params)
 {
-	pthread_mutex_lock(philo->left);
+	//pthread_mutex_lock(philo->left);
 	print_action(philo, "has taken a fork");
 	precise_usleep(params->time_to_die);
-	pthread_mutex_unlock(philo->left);
+	//pthread_mutex_unlock(philo->left);
 }
 
 void	*dining(void *philo_data)
@@ -34,17 +34,15 @@ void	*dining(void *philo_data)
 	}	
 	if (philo->id % 2 != 0)
 		philo_sleep(philo, philo->params);
-	pthread_mutex_lock(&philo->params->dead_flag);
+	//pthread_mutex_lock(&philo->params->dead_flag);
 	while (!philo->params->dead)
 	{
-		pthread_mutex_unlock(&philo->params->dead_flag);
+		//pthread_mutex_unlock(&philo->params->dead_flag);
 		philo_think(philo);
-		philo_take_forks(philo);
 		philo_eat(philo, philo->params);
-		philo_release_forks(philo);
 		philo_sleep(philo, philo->params);
-		pthread_mutex_lock(&philo->params->dead_flag);
+		//pthread_mutex_lock(&philo->params->dead_flag);
 	}
-	pthread_mutex_unlock(&philo->params->dead_flag);
+	//pthread_mutex_unlock(&philo->params->dead_flag);
 	return (NULL);
 }

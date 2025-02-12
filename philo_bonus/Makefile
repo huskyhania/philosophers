@@ -12,7 +12,7 @@
 
 NAME	= philo
 
-SRC	= main.c initialization.c utils.c monitor.c routine.c eat_think_sleep.c threads.c
+SRC	= main.c initialization.c utils.c monitor.c routine.c eat_think_sleep.c threads.c processes.c
 
 HEAD	= philo.h
 

@@ -30,31 +30,6 @@ void	philo_eat(t_philo *philo, t_all *params)
 	//pthread_mutex_unlock(&philo->meal_lock);
 }
 
-void	philo_take_forks(t_philo *philo)
-{
-	if (philo->id % 2 == 0
-		|| (philo->id == 1 && philo->params->no_philos % 2 != 0))
-	{
-		//pthread_mutex_lock(philo->left);
-		print_action(philo, "has taken a fork");
-		//pthread_mutex_lock(philo->right);
-		print_action(philo, "has taken a fork");
-	}
-	else
-	{
-		//pthread_mutex_lock(philo->right);
-		print_action(philo, "has taken a fork");
-		//pthread_mutex_lock(philo->left);
-		print_action(philo, "has taken a fork");
-	}
-}
-
-/*void	philo_release_forks(t_philo *philo)
-{
-	pthread_mutex_unlock(philo->right);
-	pthread_mutex_unlock(philo->left);
-}*/ solve with semaphor
-
 void	philo_sleep(t_philo *philo, t_all *params)
 {
 	print_action(philo, "is sleeping");

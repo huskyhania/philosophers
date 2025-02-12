@@ -33,15 +33,15 @@ int	init_semaphors(t_all *params)
 	params->print_sem = sem_open("print_sem", O_CREAT , 0644, 1);
 	if (params->print_sem == SEM_FAILED)
 	{
-		sem_close("sem_forks");
+		sem_close(params->sem_forks);
 		sem_unlink("sem_forks");
 		return (printf("semaphor for print fail\n"));
 	}
 	params->death_sem = sem_open("death_sem", O_CREAT , 0644, 1);
 	if (params->death_sem == SEM_FAILED)
 	{
-		sem_close("sem_forks");
-		sem_close("print_sem");
+		sem_close(params->sem_forks);
+		sem_close(params->print_sem);
 		sem_unlink("sem_forks");
 		sem_unlink("print_sem");
 		return (printf("semaphor for death flag fail\n"));
@@ -76,5 +76,12 @@ int	init_philos(int *input, t_all *params, int argc)
 		return (1);
 	if (fill_philo_structs(params))
 		return (1);
+	create_processes(params);
+	sem_close(params->sem_forks);
+	sem_close(params->print_sem);
+	sem_close(params->death_sem);
+	sem_unlink("sem_forks");
+	sem_unlink("print_sem");
+	sem_unlink("death_sem");
 	return (0);
 }
