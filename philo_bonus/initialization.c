@@ -27,9 +27,11 @@ static void	fill_struct(int *input, t_all *params, int argc)
 }
 int	init_semaphors(t_all *params)
 {
+	sem_unlink("sem_forks");
 	params->sem_forks = sem_open("sem_forks", O_CREAT , 0644, params->no_philos);
 	if (params->sem_forks == SEM_FAILED)
 		return (printf("semaphor for forks fail\n"));
+	sem_unlink("print_sem");
 	params->print_sem = sem_open("print_sem", O_CREAT , 0644, 1);
 	if (params->print_sem == SEM_FAILED)
 	{
@@ -37,6 +39,7 @@ int	init_semaphors(t_all *params)
 		sem_unlink("sem_forks");
 		return (printf("semaphor for print fail\n"));
 	}
+	sem_unlink("death_sem");
 	params->death_sem = sem_open("death_sem", O_CREAT , 0644, 1);
 	if (params->death_sem == SEM_FAILED)
 	{

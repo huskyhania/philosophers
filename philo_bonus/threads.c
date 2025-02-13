@@ -18,7 +18,7 @@
 		printf("Failed to join monitor thread\n");
 }
 
-int	init_threads(t_all *p, int i)
+int	run_monitor(t_all *p, t_philo *philo)
 {
 	if (pthread_create(&p->monitor, NULL, monitor, p) != 0)
 	{

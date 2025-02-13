@@ -16,6 +16,8 @@ void	run_philosophers(t_all *params, t_philo *philo)
 {
 	while (get_time_ms() < philo->params->start_time)
 		usleep(100);
+	if (params->no_philos % 2 != 0 && philo->id % 2 != 0)
+		philo_sleep(philo, philo->params);
 	while (!params->dead)
 	{
 		philo_think(philo);
@@ -47,7 +49,16 @@ int	fork_for_philo(t_all *params, int i)
 	if (params->pid_arr[i] == -1)
 		return (1);
 	if (params->pid_arr[i] == 0)
+	{
+		if (pthread_create(&params->t_philo[i].monitor_th, NULL, monitor, &params->t_philo[i]) != 0)
+		{
+			printf("Failed to create monitor thread for philosopher %d\n", i);
+			exit (3);
+		}
 		run_philosophers(params, &params->t_philo[i]);
+		pthread_join(params->t_philo[i].monitor_th, NULL);
+		exit (2);
+	}
 	return (0);
 }
 
@@ -74,6 +85,11 @@ void wait_for_philosophers(t_all *params)
 	{
 		if (waitpid(params->pid_arr[i], &status, 0) == -1)
 			printf("waitpid failed\n");
+		else if (waitpid(params->pid_arr[i], &status, 0) == 2)
+		{
+			printf("process for philo %d exited with %d\n", i + 1, WEXITSTATUS(status));
+			clean_up_processes(params, params->no_philos);
+		}
 		else if (WIFEXITED(status))
 			printf("Philosopher %d exited with status %d\n", i + 1, WEXITSTATUS(status));
 		i++;

@@ -47,6 +47,7 @@ typedef struct s_philosopher
 	int				id;
 	int				meals_count;
 	long			last_meals_time;
+	pthread_t		monitor_th;
 	// meal sem?
 	t_all			*params;
 }	t_philo;
