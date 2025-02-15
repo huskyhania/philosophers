@@ -16,28 +16,28 @@ void	*monitor(void *philo)
 {
 	t_all	*params;
 	t_philo	*one_philo;
+	int	i;
 
 	one_philo = (t_philo *)philo;
 	params = (t_all *)one_philo->params;
-	printf("i'm monitoring\n");
+	i = -1;
 	while (1)
 	{
+		sem_wait(params->eat_sem);
 		if (((get_time_ms() - one_philo->last_meals_time)
 			> params->time_to_die))
 		{
-			printf("condition for dying met\n");
-			sem_wait(params->death_sem);
+			sem_post(params->eat_sem);
 			sem_wait(params->print_sem);
 			printf("%ld %d died\n",
 				get_time_ms() - params->start_time, one_philo->id);
-			sem_post(params->print_sem);
-			sem_close(params->sem_forks);
-			sem_close(params->print_sem);
-			sem_close(params->death_sem);
-			printf("philosopher died, about to exit...\n");
-			exit (2);
+			sem_wait(params->death_sem);
+			params->dead = 1;
+			sem_post(params->death_sem);
+			sem_post(params->terminate_sem);
+			break ;
 		}
-		//usleep for testing???
+		sem_post(params->eat_sem);
 	}
 	return (NULL);
 }

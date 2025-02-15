@@ -18,8 +18,10 @@ void	run_philosophers(t_all *params, t_philo *philo)
 		usleep(100);
 	if (params->no_philos % 2 != 0 && philo->id % 2 != 0)
 		philo_sleep(philo, philo->params);
+	sem_wait(params->death_sem);
 	while (!params->dead)
 	{
+		sem_post(params->death_sem);
 		philo_think(philo);
 		sem_wait(params->sem_forks);
 		print_action(philo, "has taken a fork");
@@ -33,14 +35,38 @@ void	run_philosophers(t_all *params, t_philo *philo)
 			sem_close(philo->params->sem_forks);
 			sem_close(philo->params->print_sem);
 			sem_close(philo->params->death_sem);
+			sem_close(philo->params->terminate_sem);
+			sem_close(philo->params->eat_sem);
+			if (params->pid_arr)
+			{
+				free(params->pid_arr);
+				params->pid_arr = NULL;
+			}
+			//pthread_join(philo->monitor_th, NULL);
+			pthread_detach(philo->monitor_th);
+			if (params->t_philo)
+			{
+				free(params->t_philo);
+				params->t_philo = NULL;
+			}
 			exit (0);
 		}
 		philo_sleep(philo, philo->params);
+		sem_wait(params->death_sem);
 	}
+	sem_post(params->death_sem);
 	sem_close(philo->params->sem_forks);
 	sem_close(philo->params->print_sem);
 	sem_close(philo->params->death_sem);
-	exit (1);
+	sem_close(philo->params->terminate_sem);
+	sem_close(philo->params->eat_sem);
+	free(params->pid_arr);
+	params->pid_arr = NULL;
+	//pthread_detach(philo->monitor_th);
+	pthread_join(philo->monitor_th, NULL);
+	free(params->t_philo);
+	params->t_philo = NULL;
+	exit (2);
 }
 
 int	fork_for_philo(t_all *params, int i)
@@ -56,8 +82,9 @@ int	fork_for_philo(t_all *params, int i)
 			exit (3);
 		}
 		run_philosophers(params, &params->t_philo[i]);
-		pthread_join(params->t_philo[i].monitor_th, NULL);
-		exit (2);
+		//pthread_join(params->t_philo[i].monitor_th, NULL);
+		//pthread_detach(params->t_philo[i].monitor_th);
+		//exit (2);
 	}
 	return (0);
 }
@@ -75,25 +102,37 @@ void	clean_up_processes(t_all *params, int count)
 	free(params->pid_arr);
 	params->pid_arr = NULL;
 }
+void	*watch_terminate_sem(void *arg)
+{
+	t_all *params = (t_all *)arg;
+
+	sem_wait(params->terminate_sem);
+	params->dead = 1;
+
+	for (int j = 0; j < params->no_philos; j++)
+	{
+		if (params->pid_arr[j] > 0)
+			kill(params->pid_arr[j], SIGKILL);
+	}
+	return (NULL);
+}
+
 void wait_for_philosophers(t_all *params)
 {
-	int	i;
-	int	status;
-	
-	i = 0;
-	while (i < params->no_philos)
+	pthread_t watcher_thread;
+	int i, status;
+	if (pthread_create(&watcher_thread, NULL, watch_terminate_sem, params) != 0)
+	{
+		return;
+	}
+	for (i = 0; i < params->no_philos; i++)
 	{
 		if (waitpid(params->pid_arr[i], &status, 0) == -1)
 			printf("waitpid failed\n");
-		else if (waitpid(params->pid_arr[i], &status, 0) == 2)
-		{
-			printf("process for philo %d exited with %d\n", i + 1, WEXITSTATUS(status));
-			clean_up_processes(params, params->no_philos);
-		}
-		else if (WIFEXITED(status))
-			printf("Philosopher %d exited with status %d\n", i + 1, WEXITSTATUS(status));
-		i++;
 	}
+	sem_post(params->terminate_sem);
+	pthread_join(watcher_thread, NULL);
+	//sem_post(params->terminate_sem);
 }
 
 int	create_processes(t_all *params)
@@ -117,5 +156,9 @@ int	create_processes(t_all *params)
 		}
 	}
 	wait_for_philosophers(params);
+	free(params->pid_arr);
+	params->pid_arr = NULL;
+	free(params->t_philo);
+	params->t_philo = NULL;
 	return (0);
 }

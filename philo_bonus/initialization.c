@@ -49,7 +49,33 @@ int	init_semaphors(t_all *params)
 		sem_unlink("print_sem");
 		return (printf("semaphor for death flag fail\n"));
 	}
-	printf("fork, print and death semaphors created\n");
+	sem_unlink("terminate_sem");
+	params->terminate_sem = sem_open("terminate_sem", O_CREAT, 0644, 0);
+	if (params->terminate_sem == SEM_FAILED)
+	{
+		sem_close(params->sem_forks);
+		sem_close(params->print_sem);
+		sem_close(params->death_sem);
+		sem_unlink("sem_forks");
+		sem_unlink("print_sem");
+		sem_unlink("death_sem");
+		return (printf("semaphor for terminate flag fail\n"));
+	}
+	sem_unlink("eat_sem");
+	params->eat_sem = sem_open("eat_sem", O_CREAT, 0644, 1);
+	if (params->eat_sem == SEM_FAILED)
+	{
+		sem_close(params->terminate_sem);
+		sem_close(params->sem_forks);
+		sem_close(params->print_sem);
+		sem_close(params->death_sem);
+		sem_unlink("sem_forks");
+		sem_unlink("print_sem");
+		sem_unlink("death_sem");
+		sem_unlink("terminate_sem");
+		return (printf("semaphor for meal eating fail\n"));
+	}
+	printf("fork, print, death and term semaphors created\n");
 	return (0);
 }
 
@@ -83,8 +109,12 @@ int	init_philos(int *input, t_all *params, int argc)
 	sem_close(params->sem_forks);
 	sem_close(params->print_sem);
 	sem_close(params->death_sem);
+	sem_close(params->terminate_sem);
+	sem_close(params->eat_sem);
 	sem_unlink("sem_forks");
 	sem_unlink("print_sem");
 	sem_unlink("death_sem");
+	sem_unlink("terminate_sem");
+	sem_unlink("eat_sem");
 	return (0);
 }

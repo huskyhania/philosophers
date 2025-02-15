@@ -39,6 +39,8 @@ typedef struct s_philo_table
 	sem_t					*sem_forks;
 	sem_t					*print_sem;
 	sem_t					*death_sem;
+	sem_t					*terminate_sem;
+	sem_t					*eat_sem;
 	//monitor in parent?
 }	t_all;
 

@@ -21,13 +21,11 @@ void	philo_think(t_philo *philo)
 void	philo_eat(t_philo *philo, t_all *params)
 {
 	print_action(philo, "is eating");
-	//pthread_mutex_lock(&philo->meal_lock);
+	sem_wait(params->eat_sem);
 	philo->last_meals_time = get_time_ms();
-	//pthread_mutex_unlock(&philo->meal_lock);
+	sem_post(params->eat_sem);
 	precise_usleep(params->time_to_eat);
-	//pthread_mutex_lock(&philo->meal_lock);
 	philo->meals_count++;
-	//pthread_mutex_unlock(&philo->meal_lock);
 }
 
 void	philo_sleep(t_philo *philo, t_all *params)
