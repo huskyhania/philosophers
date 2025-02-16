@@ -41,7 +41,6 @@ typedef struct s_philo_table
 	sem_t					*death_sem;
 	sem_t					*terminate_sem;
 	sem_t					*eat_sem;
-	//monitor in parent?
 }	t_all;
 
 typedef struct s_philosopher
@@ -50,24 +49,18 @@ typedef struct s_philosopher
 	int				meals_count;
 	long			last_meals_time;
 	pthread_t		monitor_th;
-	// meal sem?
 	t_all			*params;
 }	t_philo;
 
 int		init_philos(int *input, t_all *params, int argc);
-void	*dining(void *philo_data);
-int		init_threads(t_all *params, int i);
 long	get_time_ms(void);
 void	print_action(t_philo *philo, char *message);
 void	*monitor(void *param);
 int		precise_usleep(int millisecs);
-void	cleanup_mutexes(t_all *params);
 void	all_cleanup(t_all *params);
 
 void	philo_think(t_philo *philo);
 void	philo_eat(t_philo *philo, t_all *params);
-void	philo_take_forks(t_philo *philo);
-void	philo_release_forks(t_philo *philo);
 void	philo_sleep(t_philo *philo, t_all *params);
 
 int		create_processes(t_all *params);

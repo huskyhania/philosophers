@@ -25,14 +25,15 @@ static void	fill_struct(int *input, t_all *params, int argc)
 	params->dead = 0;
 	params->start_time = get_time_ms() + 1000;
 }
+
 int	init_semaphors(t_all *params)
 {
 	sem_unlink("sem_forks");
-	params->sem_forks = sem_open("sem_forks", O_CREAT , 0644, params->no_philos);
+	params->sem_forks = sem_open("sem_forks", O_CREAT, 0644, params->no_philos);
 	if (params->sem_forks == SEM_FAILED)
 		return (printf("semaphor for forks fail\n"));
 	sem_unlink("print_sem");
-	params->print_sem = sem_open("print_sem", O_CREAT , 0644, 1);
+	params->print_sem = sem_open("print_sem", O_CREAT, 0644, 1);
 	if (params->print_sem == SEM_FAILED)
 	{
 		sem_close(params->sem_forks);
@@ -40,7 +41,7 @@ int	init_semaphors(t_all *params)
 		return (printf("semaphor for print fail\n"));
 	}
 	sem_unlink("death_sem");
-	params->death_sem = sem_open("death_sem", O_CREAT , 0644, 1);
+	params->death_sem = sem_open("death_sem", O_CREAT, 0644, 1);
 	if (params->death_sem == SEM_FAILED)
 	{
 		sem_close(params->sem_forks);
@@ -75,7 +76,6 @@ int	init_semaphors(t_all *params)
 		sem_unlink("terminate_sem");
 		return (printf("semaphor for meal eating fail\n"));
 	}
-	printf("fork, print, death and term semaphors created\n");
 	return (0);
 }
 
@@ -100,7 +100,6 @@ static int	fill_philo_structs(t_all *params)
 int	init_philos(int *input, t_all *params, int argc)
 {
 	fill_struct(input, params, argc);
-	printf("main struct created\n");
 	if (init_semaphors(params))
 		return (1);
 	if (fill_philo_structs(params))

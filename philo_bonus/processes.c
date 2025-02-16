@@ -12,6 +12,32 @@
 
 #include "philo.h"
 
+void	one_philo(t_all *params, t_philo *philo)
+{
+	while (get_time_ms() < philo->params->start_time)
+		usleep(100);
+	while (!params->dead)
+	{
+		philo_think(philo);
+		sem_wait(params->sem_forks);
+		print_action(philo, "has taken a fork");
+		precise_usleep(params->time_to_die);
+		sem_post(params->sem_forks);
+	}
+	sem_post(params->death_sem);
+	sem_close(params->sem_forks);
+	sem_close(params->print_sem);
+	sem_close(params->death_sem);
+	sem_close(params->terminate_sem);
+	sem_close(params->eat_sem);
+	free(params->pid_arr);
+	params->pid_arr = NULL;
+	pthread_join(philo->monitor_th, NULL);
+	free(params->t_philo);
+	params->t_philo = NULL;
+	exit (2);
+}
+
 void	run_philosophers(t_all *params, t_philo *philo)
 {
 	while (get_time_ms() < philo->params->start_time)
@@ -32,37 +58,36 @@ void	run_philosophers(t_all *params, t_philo *philo)
 		sem_post(params->sem_forks);
 		if (params->meals_no > 0 && philo->meals_count == params->meals_no)
 		{
-			sem_close(philo->params->sem_forks);
-			sem_close(philo->params->print_sem);
-			sem_close(philo->params->death_sem);
-			sem_close(philo->params->terminate_sem);
-			sem_close(philo->params->eat_sem);
 			if (params->pid_arr)
 			{
 				free(params->pid_arr);
 				params->pid_arr = NULL;
 			}
-			//pthread_join(philo->monitor_th, NULL);
-			pthread_detach(philo->monitor_th);
+			pthread_join(philo->monitor_th, NULL);
+			//pthread_detach(philo->monitor_th);
 			if (params->t_philo)
 			{
 				free(params->t_philo);
 				params->t_philo = NULL;
 			}
+			sem_close(params->sem_forks);
+			sem_close(params->print_sem);
+			sem_close(params->death_sem);
+			sem_close(params->terminate_sem);
+			sem_close(params->eat_sem);
 			exit (0);
 		}
 		philo_sleep(philo, philo->params);
 		sem_wait(params->death_sem);
 	}
 	sem_post(params->death_sem);
-	sem_close(philo->params->sem_forks);
-	sem_close(philo->params->print_sem);
-	sem_close(philo->params->death_sem);
-	sem_close(philo->params->terminate_sem);
-	sem_close(philo->params->eat_sem);
+	sem_close(params->sem_forks);
+	sem_close(params->print_sem);
+	sem_close(params->death_sem);
+	sem_close(params->terminate_sem);
+	sem_close(params->eat_sem);
 	free(params->pid_arr);
 	params->pid_arr = NULL;
-	//pthread_detach(philo->monitor_th);
 	pthread_join(philo->monitor_th, NULL);
 	free(params->t_philo);
 	params->t_philo = NULL;
@@ -81,10 +106,10 @@ int	fork_for_philo(t_all *params, int i)
 			printf("Failed to create monitor thread for philosopher %d\n", i);
 			exit (3);
 		}
-		run_philosophers(params, &params->t_philo[i]);
-		//pthread_join(params->t_philo[i].monitor_th, NULL);
-		//pthread_detach(params->t_philo[i].monitor_th);
-		//exit (2);
+		if (params->no_philos == 1)
+			one_philo(params, &params->t_philo[i]);
+		else
+			run_philosophers(params, &params->t_philo[i]);
 	}
 	return (0);
 }

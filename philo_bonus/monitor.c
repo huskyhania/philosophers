@@ -16,16 +16,20 @@ void	*monitor(void *philo)
 {
 	t_all	*params;
 	t_philo	*one_philo;
-	int	i;
 
 	one_philo = (t_philo *)philo;
 	params = (t_all *)one_philo->params;
-	i = -1;
+	while (get_time_ms() < params->start_time)
+		usleep(100);
 	while (1)
 	{
 		sem_wait(params->eat_sem);
-		if (((get_time_ms() - one_philo->last_meals_time)
-			> params->time_to_die))
+		if ((params->meals_no > 0) && one_philo->meals_count >= params->meals_no)
+		{
+			sem_post(params->eat_sem);
+			break ;
+		}
+		if (((get_time_ms() - one_philo->last_meals_time) > params->time_to_die))
 		{
 			sem_post(params->eat_sem);
 			sem_wait(params->print_sem);
@@ -38,6 +42,7 @@ void	*monitor(void *philo)
 			break ;
 		}
 		sem_post(params->eat_sem);
+		//usleep(500);
 	}
 	return (NULL);
 }

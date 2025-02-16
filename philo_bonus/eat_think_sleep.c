@@ -25,7 +25,9 @@ void	philo_eat(t_philo *philo, t_all *params)
 	philo->last_meals_time = get_time_ms();
 	sem_post(params->eat_sem);
 	precise_usleep(params->time_to_eat);
+	sem_wait(params->eat_sem);
 	philo->meals_count++;
+	sem_post(params->eat_sem);
 }
 
 void	philo_sleep(t_philo *philo, t_all *params)
