@@ -42,7 +42,7 @@ void	run_philosophers(t_all *params, t_philo *philo)
 {
 	while (get_time_ms() < philo->params->start_time)
 		usleep(100);
-	if (params->no_philos % 2 != 0 && philo->id % 2 != 0)
+	if (philo->id % 2 != 0)
 		philo_sleep(philo, philo->params);
 	sem_wait(params->death_sem);
 	while (!params->dead)
@@ -64,7 +64,6 @@ void	run_philosophers(t_all *params, t_philo *philo)
 				params->pid_arr = NULL;
 			}
 			pthread_join(philo->monitor_th, NULL);
-			//pthread_detach(philo->monitor_th);
 			if (params->t_philo)
 			{
 				free(params->t_philo);

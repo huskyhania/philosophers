@@ -31,7 +31,7 @@ void	*dining(void *philo_data)
 	{
 		one_philo(philo, philo->params);
 		return (NULL);
-	}	
+	}
 	if (philo->id % 2 != 0)
 		philo_sleep(philo, philo->params);
 	pthread_mutex_lock(&philo->params->dead_flag);

@@ -52,7 +52,7 @@ int	check_eating_done(t_all *params)
 		params->dead = 1;
 		pthread_mutex_unlock(&params->dead_flag);
 		pthread_mutex_lock(&params->print_mutex);
-		printf("All philosophers have eaten enough times. Ending simulation.\n");
+		printf("All philosophers ate enough. Ending simulation.\n");
 		pthread_mutex_unlock(&params->print_mutex);
 		return (1);
 	}

@@ -48,9 +48,6 @@ int	precise_usleep(int millisecs)
 
 void	all_cleanup(t_all *params)
 {
-	int	i;
-
-	i = -1;
 	if (params->t_philo)
 	{
 		free(params->t_philo);

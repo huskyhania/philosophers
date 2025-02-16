@@ -82,9 +82,6 @@ static int	fill_philo_structs(t_all *params)
 
 int	init_philos(int *input, t_all *params, int argc)
 {
-	int	i;
-
-	i = -1;
 	fill_struct(input, params, argc);
 	params->forks = malloc(sizeof(pthread_mutex_t) * params->no_philos);
 	if (!params->forks)
