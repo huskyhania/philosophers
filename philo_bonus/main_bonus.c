@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include "philo_bonus.h"
 
 static int	is_number(const char *str)
 {
@@ -96,7 +96,10 @@ int	main(int argc, char **argv)
 		if (!input_check(argc, argv, input))
 		{
 			if (!init_philos(input, &ph_params, argc))
+			{
 				all_cleanup(&ph_params);
+				unlink_semaphores(&ph_params);
+			}
 		}
 		else
 			return (input_error());

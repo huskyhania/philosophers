@@ -10,11 +10,11 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME	= philo
+NAME	= philo_bonus
 
-SRC	= main.c initialization.c utils.c monitor.c eat_think_sleep.c processes.c
+SRC	= main_bonus.c initialization_bonus.c utils_bonus.c monitor_bonus.c eat_think_sleep_bonus.c processes_bonus.c sem_utils_bonus.c cleanup_bonus.c
 
-HEAD	= philo.h
+HEAD	= philo_bonus.h
 
 OBJS	= ${SRC:.c=.o}
 
@@ -22,7 +22,8 @@ RM		= rm -f
 
 CC		= cc
 
-CFLAGS	= -Wall -Wextra -Werror
+CFLAGS	= -Wall -Wextra -Werror -fsanitize=address -g
+LDFLAGS = -fsanitize=address
 
 all: ${NAME}
 
@@ -30,7 +31,7 @@ all: ${NAME}
 	${CC} ${CFLAGS} -c $< -o $@
 
 ${NAME}: ${OBJS}
-	${CC} ${CFLAGS} ${OBJS} -o ${NAME}
+	${CC} ${CFLAGS} ${OBJS} -o ${NAME} ${LDFLAGS}
 
 clean:
 	${RM} ${OBJS}

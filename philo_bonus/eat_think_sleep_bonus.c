@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include "philo_bonus.h"
 
 void	philo_think(t_philo *philo)
 {
@@ -34,4 +34,21 @@ void	philo_sleep(t_philo *philo, t_all *params)
 {
 	print_action(philo, "is sleeping");
 	precise_usleep(params->time_to_sleep);
+}
+
+void	pick_up_forks(t_philo *philo, t_all *params)
+{
+	sem_wait(params->sem_forks);
+	print_action(philo, "has taken a fork");
+	sem_wait(params->sem_forks);
+	print_action(philo, "has taken a fork");
+}
+
+void	start_simulation(t_philo *philo, t_all *params)
+{
+	(void)params;
+	while (get_time_ms() < philo->params->start_time)
+		usleep(100);
+	if (philo->id % 2 != 0)
+		philo_sleep(philo, philo->params);
 }

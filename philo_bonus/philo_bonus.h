@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PHILO_H
-# define PHILO_H
+#ifndef PHILO_BONUS_H
+# define PHILO_BONUS_H
 
 # include <pthread.h>
 # include <stdio.h>
@@ -24,6 +24,8 @@
 # include <stdlib.h>
 # include <fcntl.h>
 # include <signal.h>
+# include <errno.h>
+# include <stdatomic.h>
 
 typedef struct s_philo_table
 {
@@ -33,6 +35,7 @@ typedef struct s_philo_table
 	int						time_to_sleep;
 	int						meals_no;
 	int						dead;
+	atomic_int				full_flag;
 	int						*pid_arr;
 	struct s_philosopher	*t_philo;
 	long					start_time;
@@ -57,12 +60,23 @@ long	get_time_ms(void);
 void	print_action(t_philo *philo, char *message);
 void	*monitor(void *param);
 int		precise_usleep(int millisecs);
-void	all_cleanup(t_all *params);
 
 void	philo_think(t_philo *philo);
 void	philo_eat(t_philo *philo, t_all *params);
+void	pick_up_forks(t_philo *philo, t_all *params);
 void	philo_sleep(t_philo *philo, t_all *params);
+void	start_simulation(t_philo *philo, t_all *params);
 
 int		create_processes(t_all *params);
+int		wait_for_philosophers(t_all *params);
+int		fork_for_philo(t_all *params, int i);
+int		init_one_sem(sem_t **sem, const char *name, int value);
+
+void	all_cleanup(t_all *params);
+void	clean_philos(t_all *params);
+void	clean_pids(t_all *params);
+void	clean_up_processes(t_all *params, int count);
+void	cleanup_semaphores(t_all *params);
+void	unlink_semaphores(t_all *params);
 
 #endif

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include "philo_bonus.h"
 
 static void	fill_struct(int *input, t_all *params, int argc)
 {
@@ -23,58 +23,26 @@ static void	fill_struct(int *input, t_all *params, int argc)
 	else
 		params->meals_no = -1;
 	params->dead = 0;
+	params->full_flag = 0;
 	params->start_time = get_time_ms() + 1000;
+	params->sem_forks = NULL;
+	params->print_sem = NULL;
+	params->death_sem = NULL;
+	params->terminate_sem = NULL;
+	params->eat_sem = NULL;
 }
 
 int	init_semaphors(t_all *params)
 {
-	sem_unlink("sem_forks");
-	params->sem_forks = sem_open("sem_forks", O_CREAT, 0644, params->no_philos);
-	if (params->sem_forks == SEM_FAILED)
-		return (printf("semaphor for forks fail\n"));
-	sem_unlink("print_sem");
-	params->print_sem = sem_open("print_sem", O_CREAT, 0644, 1);
-	if (params->print_sem == SEM_FAILED)
+	if (init_one_sem(&params->sem_forks, "sem_forks", params->no_philos)
+		|| init_one_sem(&params->print_sem, "print_sem", 1)
+		|| init_one_sem(&params->death_sem, "death_sem", 1)
+		|| init_one_sem(&params->terminate_sem, "terminate_sem", 0)
+		|| init_one_sem(&params->eat_sem, "eat_sem", 1))
 	{
-		sem_close(params->sem_forks);
-		sem_unlink("sem_forks");
-		return (printf("semaphor for print fail\n"));
-	}
-	sem_unlink("death_sem");
-	params->death_sem = sem_open("death_sem", O_CREAT, 0644, 1);
-	if (params->death_sem == SEM_FAILED)
-	{
-		sem_close(params->sem_forks);
-		sem_close(params->print_sem);
-		sem_unlink("sem_forks");
-		sem_unlink("print_sem");
-		return (printf("semaphor for death flag fail\n"));
-	}
-	sem_unlink("terminate_sem");
-	params->terminate_sem = sem_open("terminate_sem", O_CREAT, 0644, 0);
-	if (params->terminate_sem == SEM_FAILED)
-	{
-		sem_close(params->sem_forks);
-		sem_close(params->print_sem);
-		sem_close(params->death_sem);
-		sem_unlink("sem_forks");
-		sem_unlink("print_sem");
-		sem_unlink("death_sem");
-		return (printf("semaphor for terminate flag fail\n"));
-	}
-	sem_unlink("eat_sem");
-	params->eat_sem = sem_open("eat_sem", O_CREAT, 0644, 1);
-	if (params->eat_sem == SEM_FAILED)
-	{
-		sem_close(params->terminate_sem);
-		sem_close(params->sem_forks);
-		sem_close(params->print_sem);
-		sem_close(params->death_sem);
-		sem_unlink("sem_forks");
-		sem_unlink("print_sem");
-		sem_unlink("death_sem");
-		sem_unlink("terminate_sem");
-		return (printf("semaphor for meal eating fail\n"));
+		cleanup_semaphores(params);
+		unlink_semaphores(params);
+		return (1);
 	}
 	return (0);
 }
@@ -97,6 +65,34 @@ static int	fill_philo_structs(t_all *params)
 	return (0);
 }
 
+int	create_processes(t_all *params)
+{
+	int	i;
+
+	i = -1;
+	params->pid_arr = malloc((sizeof(int)) * params->no_philos);
+	if (!params->pid_arr)
+		return (printf("pid malloc fail\n"));
+	while (++i < params->no_philos)
+		params->pid_arr[i] = -1;
+	i = -1;
+	while (++i < params->no_philos)
+	{
+		if (fork_for_philo(params, i))
+		{
+			printf("fork for philosopher fail\n");
+			clean_up_processes(params, i);
+			return (1);
+		}
+	}
+	if (wait_for_philosophers(params))
+	{
+		clean_up_processes(params, i);
+		return (1);
+	}
+	return (0);
+}
+
 int	init_philos(int *input, t_all *params, int argc)
 {
 	fill_struct(input, params, argc);
@@ -104,16 +100,10 @@ int	init_philos(int *input, t_all *params, int argc)
 		return (1);
 	if (fill_philo_structs(params))
 		return (1);
-	create_processes(params);
-	sem_close(params->sem_forks);
-	sem_close(params->print_sem);
-	sem_close(params->death_sem);
-	sem_close(params->terminate_sem);
-	sem_close(params->eat_sem);
-	sem_unlink("sem_forks");
-	sem_unlink("print_sem");
-	sem_unlink("death_sem");
-	sem_unlink("terminate_sem");
-	sem_unlink("eat_sem");
+	if (create_processes(params))
+	{
+		all_cleanup(params);
+		return (1);
+	}
 	return (0);
 }

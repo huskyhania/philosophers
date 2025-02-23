@@ -10,7 +10,18 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include "philo_bonus.h"
+
+static void	handle_death(t_all *params, t_philo *philo)
+{
+	sem_post(params->eat_sem);
+	sem_wait(params->print_sem);
+	printf("%ld %d died\n", get_time_ms() - params->start_time, philo->id);
+	sem_wait(params->death_sem);
+	params->dead = 1;
+	sem_post(params->death_sem);
+	sem_post(params->terminate_sem);
+}
 
 void	*monitor(void *philo)
 {
@@ -31,18 +42,10 @@ void	*monitor(void *philo)
 		}
 		if (((get_time_ms() - o_philo->last_meals_time) > params->time_to_die))
 		{
-			sem_post(params->eat_sem);
-			sem_wait(params->print_sem);
-			printf("%ld %d died\n",
-				get_time_ms() - params->start_time, o_philo->id);
-			sem_wait(params->death_sem);
-			params->dead = 1;
-			sem_post(params->death_sem);
-			sem_post(params->terminate_sem);
+			handle_death(params, o_philo);
 			break ;
 		}
 		sem_post(params->eat_sem);
-		//usleep(500);
 	}
 	return (NULL);
 }

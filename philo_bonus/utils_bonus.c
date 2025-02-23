@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include "philo_bonus.h"
 
 long	get_time_ms(void)
 {
@@ -44,13 +44,4 @@ int	precise_usleep(int millisecs)
 	while ((get_time_ms() - start) < millisecs)
 		usleep(500);
 	return (0);
-}
-
-void	all_cleanup(t_all *params)
-{
-	if (params->t_philo)
-	{
-		free(params->t_philo);
-		params->t_philo = NULL;
-	}
 }
