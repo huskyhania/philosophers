@@ -54,7 +54,7 @@ int		init_threads(t_all *params, int i);
 long	get_time_ms(void);
 void	print_action(t_philo *philo, char *message);
 void	*monitor(void *param);
-int		precise_usleep(int millisecs);
+int		precise_usleep(t_all *params, int millisecs);
 void	cleanup_mutexes(t_all *params);
 void	all_cleanup(t_all *params);
 

@@ -6,7 +6,7 @@
 #    By: hskrzypi <hskrzypi@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/09 18:19:12 by hskrzypi          #+#    #+#              #
-#    Updated: 2025/02/01 17:16:47 by hskrzypi         ###   ########.fr        #
+#    Updated: 2025/02/23 17:34:58 by hskrzypi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,8 +22,7 @@ RM		= rm -f
 
 CC		= cc
 
-CFLAGS	= -Wall -Wextra -Werror -fsanitize=address -g
-LDFLAGS = -fsanitize=address
+CFLAGS	= -Wall -Wextra -Werror
 
 all: ${NAME}
 
@@ -31,7 +30,7 @@ all: ${NAME}
 	${CC} ${CFLAGS} -c $< -o $@
 
 ${NAME}: ${OBJS}
-	${CC} ${CFLAGS} ${OBJS} -o ${NAME} ${LDFLAGS}
+	${CC} ${CFLAGS} ${OBJS} -o ${NAME}
 
 clean:
 	${RM} ${OBJS}

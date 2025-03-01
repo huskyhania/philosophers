@@ -36,13 +36,23 @@ void	print_action(t_philo *philo, char *message)
 	pthread_mutex_unlock(&params->dead_flag);
 }
 
-int	precise_usleep(int millisecs)
+int	precise_usleep(t_all *params, int millisecs)
 {
 	long	start;
 
 	start = get_time_ms();
 	while ((get_time_ms() - start) < millisecs)
+	{
 		usleep(500);
+		pthread_mutex_lock(&params->dead_flag);
+		if (params->dead)
+		{
+			pthread_mutex_unlock(&params->dead_flag);
+			break ;
+		}
+		else
+			pthread_mutex_unlock(&params->dead_flag);
+	}
 	return (0);
 }
 

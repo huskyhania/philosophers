@@ -16,7 +16,7 @@ static void	one_philo(t_philo *philo, t_all *params)
 {
 	pthread_mutex_lock(philo->left);
 	print_action(philo, "has taken a fork");
-	precise_usleep(params->time_to_die);
+	precise_usleep(params, params->time_to_die);
 	pthread_mutex_unlock(philo->left);
 }
 

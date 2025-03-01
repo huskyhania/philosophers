@@ -96,6 +96,11 @@ int	init_philos(int *input, t_all *params, int argc)
 	{
 		if (!init_threads(params, -1))
 			return (0);
+		else
+		{
+			free(params->t_philo);
+			params->t_philo = NULL;
+		}
 	}
 	cleanup_mutexes(params);
 	free(params->forks);

@@ -24,7 +24,7 @@ void	philo_eat(t_philo *philo, t_all *params)
 	pthread_mutex_lock(&philo->meal_lock);
 	philo->last_meals_time = get_time_ms();
 	pthread_mutex_unlock(&philo->meal_lock);
-	precise_usleep(params->time_to_eat);
+	precise_usleep(params, params->time_to_eat);
 	pthread_mutex_lock(&philo->meal_lock);
 	philo->meals_count++;
 	pthread_mutex_unlock(&philo->meal_lock);
@@ -58,5 +58,5 @@ void	philo_release_forks(t_philo *philo)
 void	philo_sleep(t_philo *philo, t_all *params)
 {
 	print_action(philo, "is sleeping");
-	precise_usleep(params->time_to_sleep);
+	precise_usleep(params, params->time_to_sleep);
 }

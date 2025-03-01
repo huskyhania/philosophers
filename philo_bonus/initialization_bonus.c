@@ -30,6 +30,7 @@ static void	fill_struct(int *input, t_all *params, int argc)
 	params->death_sem = NULL;
 	params->terminate_sem = NULL;
 	params->eat_sem = NULL;
+	params->pid_arr = NULL;
 }
 
 int	init_semaphors(t_all *params)
@@ -99,10 +100,15 @@ int	init_philos(int *input, t_all *params, int argc)
 	if (init_semaphors(params))
 		return (1);
 	if (fill_philo_structs(params))
+	{
+		cleanup_semaphores(params);
+		unlink_semaphores(params);
 		return (1);
+	}
 	if (create_processes(params))
 	{
 		all_cleanup(params);
+		unlink_semaphores(params);
 		return (1);
 	}
 	return (0);

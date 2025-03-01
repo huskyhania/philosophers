@@ -12,18 +12,21 @@
 
 #include "philo.h"
 
-void	join_threads(t_all *params)
+void	join_threads(t_all *params, int no_created, int monitor_flag)
 {
 	int	i;
 
 	i = -1;
-	while (++i < params->no_philos)
+	while (++i < no_created)
 	{
 		if (pthread_join(params->threads[i], NULL) != 0)
 			printf("Failed to join thread %d\n", i);
 	}
-	if (pthread_join(params->monitor, NULL) != 0)
-		printf("Failed to join monitor thread\n");
+	if (monitor_flag)
+	{
+		if (pthread_join(params->monitor, NULL) != 0)
+			printf("Failed to join monitor thread\n");
+	}
 	free(params->threads);
 	params->threads = NULL;
 }
@@ -37,21 +40,21 @@ int	init_threads(t_all *p, int i)
 	{
 		if (pthread_create(&p->threads[i], NULL, dining, &p->t_philo[i]) != 0)
 		{
-			while (--i >= 0)
-				pthread_detach(p->threads[i]);
-			free(p->threads);
-			p->threads = NULL;
+			pthread_mutex_lock(&p->dead_flag);
+			p->dead = 1;
+			pthread_mutex_unlock(&p->dead_flag);
+			join_threads(p, i, 0);
 			return (printf("Thread create error for philo %d\n", i + 1));
 		}
 	}
 	if (pthread_create(&p->monitor, NULL, monitor, p) != 0)
 	{
-		while (--i >= 0)
-			pthread_detach(p->threads[i]);
-		free(p->threads);
-		p->threads = NULL;
+		pthread_mutex_lock(&p->dead_flag);
+		p->dead = 1;
+		pthread_mutex_unlock(&p->dead_flag);
+		join_threads(p, p->no_philos, 0);
 		return (printf("monitor thread creation fail\n"));
 	}
-	join_threads(p);
+	join_threads(p, p->no_philos, 1);
 	return (0);
 }

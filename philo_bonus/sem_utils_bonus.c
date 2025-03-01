@@ -19,6 +19,7 @@ int	init_one_sem(sem_t **sem, const char *name, int value)
 	if (*sem == SEM_FAILED)
 	{
 		printf("Semaphore %s initialization failed\n", name);
+		*sem = NULL;
 		return (1);
 	}
 	return (0);
