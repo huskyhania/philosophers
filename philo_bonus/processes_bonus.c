@@ -66,15 +66,15 @@ int	fork_for_philo(t_all *params, int i)
 		return (1);
 	if (params->pid_arr[i] == 0)
 	{
-		if (1) //(pthread_create(&params->t_philo[i].monitor_th, NULL,
-				//monitor, &params->t_philo[i]) != 0)
+		if (pthread_create(&params->t_philo[i].monitor_th, NULL,
+				monitor, &params->t_philo[i]) != 0)
 		{
-			//flg to clean up prebviously created ones
+			sem_post(params->terminate_sem);
 			printf("Failed to create monitor thread for philosopher %d\n", i);
-			all_cleanup(params);// fuck me life 
+			all_cleanup(params);
 			exit (3);
 		}
-		if (params->no_philos == 1)
+		else if (params->no_philos == 1)
 			one_philo(params, &params->t_philo[i]);
 		else
 			run_philosophers(params, &params->t_philo[i]);

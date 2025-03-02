@@ -46,6 +46,7 @@ void	*monitor(void *philo)
 			break ;
 		}
 		sem_post(params->eat_sem);
+		usleep(500);
 	}
 	return (NULL);
 }

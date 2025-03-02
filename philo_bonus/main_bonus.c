@@ -97,6 +97,7 @@ int	main(int argc, char **argv)
 		{
 			if (!init_philos(input, &ph_params, argc))
 			{
+				sem_post(ph_params.print_sem);
 				all_cleanup(&ph_params);
 				unlink_semaphores(&ph_params);
 			}
