@@ -14,13 +14,18 @@
 
 static void	handle_death(t_all *params, t_philo *philo)
 {
+	int	i;
+
+	i = -1;
 	sem_post(params->eat_sem);
 	sem_wait(params->print_sem);
-	printf("%ld %d died\n", get_time_ms() - params->start_time, philo->id);
 	sem_wait(params->death_sem);
 	params->dead = 1;
 	sem_post(params->death_sem);
-	sem_post(params->terminate_sem);
+	printf("%ld %d died\n", get_time_ms() - params->start_time, philo->id);
+	while (++i < params->no_philos)
+		sem_post(params->terminate_sem);
+	sem_post(params->sem_forks);
 }
 
 void	*monitor(void *philo)
@@ -35,11 +40,6 @@ void	*monitor(void *philo)
 	while (1)
 	{
 		sem_wait(params->eat_sem);
-		if ((params->meals_no > 0) && o_philo->meals_count >= params->meals_no)
-		{
-			sem_post(params->eat_sem);
-			break ;
-		}
 		if (((get_time_ms() - o_philo->last_meals_time) > params->time_to_die))
 		{
 			handle_death(params, o_philo);

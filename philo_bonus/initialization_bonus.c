@@ -23,7 +23,6 @@ static void	fill_struct(int *input, t_all *params, int argc)
 	else
 		params->meals_no = -1;
 	params->dead = 0;
-	params->full_flag = 0;
 	params->start_time = get_time_ms() + 1000;
 	params->sem_forks = NULL;
 	params->print_sem = NULL;
