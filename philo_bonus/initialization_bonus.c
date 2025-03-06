@@ -23,7 +23,6 @@ static void	fill_struct(int *input, t_all *params, int argc)
 	else
 		params->meals_no = -1;
 	params->dead = 0;
-	params->full_flag = 0;
 	params->start_time = get_time_ms() + 1000;
 	params->sem_forks = NULL;
 	params->print_sem = NULL;
@@ -62,6 +61,7 @@ static int	fill_philo_structs(t_all *params)
 		params->t_philo[i].meals_count = 0;
 		params->t_philo[i].last_meals_time = params->start_time;
 		params->t_philo[i].params = params;
+		params->t_philo[i].next_food = params->start_time;
 	}
 	return (0);
 }

@@ -42,6 +42,8 @@ typedef struct s_philosopher
 	int				id;
 	int				meals_count;
 	long			last_meals_time;
+	long			next_food;
+	long			delay;
 	pthread_mutex_t	*left;
 	pthread_mutex_t	*right;
 	pthread_mutex_t	meal_lock;

@@ -65,6 +65,7 @@ static int	fill_philo_structs(t_all *params)
 		params->t_philo[i].id = i + 1;
 		params->t_philo[i].meals_count = 0;
 		params->t_philo[i].last_meals_time = params->start_time;
+		params->t_philo[i].next_food = params->start_time;
 		params->t_philo[i].left = &params->forks[i];
 		params->t_philo[i].right = &params->forks[(i + 1) % params->no_philos];
 		params->t_philo[i].params = params;

@@ -25,7 +25,6 @@
 # include <fcntl.h>
 # include <signal.h>
 # include <errno.h>
-# include <stdatomic.h>
 
 typedef struct s_philo_table
 {
@@ -35,7 +34,6 @@ typedef struct s_philo_table
 	int						time_to_sleep;
 	int						meals_no;
 	int						dead;
-	atomic_int				full_flag;
 	int						*pid_arr;
 	struct s_philosopher	*t_philo;
 	long					start_time;
@@ -51,6 +49,7 @@ typedef struct s_philosopher
 	int				id;
 	int				meals_count;
 	long			last_meals_time;
+	long			next_food;
 	pthread_t		monitor_th;
 	t_all			*params;
 }	t_philo;

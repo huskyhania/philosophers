@@ -16,7 +16,7 @@ void	one_philo(t_all *params, t_philo *philo)
 {
 	while (get_time_ms() < philo->params->start_time)
 		usleep(100);
-	while (!params->dead)
+	while (1)
 	{
 		philo_think(philo);
 		sem_wait(params->sem_forks);
@@ -24,43 +24,34 @@ void	one_philo(t_all *params, t_philo *philo)
 		precise_usleep(params->time_to_die);
 		sem_post(params->sem_forks);
 	}
-	sem_post(params->death_sem);
-	cleanup_semaphores(params);
-	clean_pids(params);
-	pthread_join(philo->monitor_th, NULL);
-	clean_philos(params);
-	exit (2);
 }
 
 void	run_philosophers(t_all *params, t_philo *philo)
 {
+	long	postpone;
+
 	start_simulation(philo, philo->params);
-	sem_wait(params->death_sem);
-	while (!params->dead)
+	while (1)
 	{
-		sem_post(params->death_sem);
+		postpone = philo->next_food - get_time_ms();
+		if (params->no_philos % 2 == 1 && postpone > 0)
+			precise_usleep(postpone);
 		philo_think(philo);
 		pick_up_forks(philo, philo->params);
 		philo_eat(philo, philo->params);
 		sem_post(params->sem_forks);
 		sem_post(params->sem_forks);
 		if (params->meals_no > 0 && philo->meals_count == params->meals_no)
-		{
-			pthread_join(philo->monitor_th, NULL);
-			all_cleanup(params);
-			exit (0);
-		}
+			sem_post(params->terminate_sem);
 		philo_sleep(philo, philo->params);
-		sem_wait(params->death_sem);
 	}
-	sem_post(params->death_sem);
-	pthread_join(philo->monitor_th, NULL);
-	all_cleanup(params);
-	exit (2);
 }
 
 int	fork_for_philo(t_all *params, int i)
 {
+	int	j;
+
+	j = -1;
 	params->pid_arr[i] = fork();
 	if (params->pid_arr[i] == -1)
 		return (1);
@@ -69,7 +60,8 @@ int	fork_for_philo(t_all *params, int i)
 		if (pthread_create(&params->t_philo[i].monitor_th, NULL,
 				monitor, &params->t_philo[i]) != 0)
 		{
-			sem_post(params->terminate_sem);
+			while (++j < params->no_philos)
+				sem_post(params->terminate_sem);
 			printf("Failed to create monitor thread for philosopher %d\n", i);
 			all_cleanup(params);
 			exit (3);
@@ -90,10 +82,9 @@ void	*watch_terminate_sem(void *arg)
 
 	i = -1;
 	params = (t_all *)arg;
-	sem_wait(params->terminate_sem);
-	if (params->full_flag == params->no_philos)
-		return (NULL);
-	params->dead = 1;
+	while (++i < params->no_philos)
+		sem_wait(params->terminate_sem);
+	i = -1;
 	while (++i < params->no_philos)
 	{
 		if (params->pid_arr[i] > 0)
@@ -120,17 +111,7 @@ int	wait_for_philosophers(t_all *params)
 	status = -1;
 	if (pthread_create(&watcher_thread, NULL, watch_terminate_sem, params) != 0)
 		return (printf("termination watcher thread creation fail\n"));
-	i = -1;
-	while (++i < params->no_philos)
-	{
-		if (waitpid(params->pid_arr[i], &status, 0) == -1 && errno != ECHILD)
-			printf("waitpid failed\n");
-		if (status == 0)
-			params->full_flag++;
-	}
-	sem_post(params->terminate_sem);
 	pthread_join(watcher_thread, NULL);
-	if (params->full_flag == params->no_philos)
-		printf("All philosophers have eaten enough times\n");
+	sem_post(params->print_sem);
 	return (0);
 }

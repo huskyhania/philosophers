@@ -23,6 +23,7 @@ void	philo_eat(t_philo *philo, t_all *params)
 	print_action(philo, "is eating");
 	sem_wait(params->eat_sem);
 	philo->last_meals_time = get_time_ms();
+	philo->next_food = philo->last_meals_time + params->time_to_eat * 2 + 1;
 	sem_post(params->eat_sem);
 	precise_usleep(params->time_to_eat);
 	sem_wait(params->eat_sem);

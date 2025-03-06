@@ -23,6 +23,7 @@ void	philo_eat(t_philo *philo, t_all *params)
 	print_action(philo, "is eating");
 	pthread_mutex_lock(&philo->meal_lock);
 	philo->last_meals_time = get_time_ms();
+	philo->next_food = philo->last_meals_time + params->time_to_eat * 2 + 1;
 	pthread_mutex_unlock(&philo->meal_lock);
 	precise_usleep(params, params->time_to_eat);
 	pthread_mutex_lock(&philo->meal_lock);
